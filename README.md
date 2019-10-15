@@ -69,6 +69,7 @@ This can be done when the plugin is installed using the BLUETOOTH_USAGE_DESCRIPT
 - [ble.autoConnect](#autoconnect)
 - [ble.disconnect](#disconnect)
 - [ble.requestMtu](#requestmtu)
+- [ble.requestConnectionPriority](#requestconnectionpriority)
 - [ble.read](#read)
 - [ble.write](#write)
 - [ble.writeWithoutResponse](#writewithoutresponse)
@@ -327,6 +328,28 @@ This function may be used to request (on Android) a larger MTU size to be able t
 - __mtu__: MTU size
 - __success__: Success callback function that is invoked when the connection is successful. [optional]
 - __failure__: Error callback function, invoked when error occurs. [optional]
+
+## requestConnectionPriority
+
+requestConnectionPriority
+
+    ble.requestConnectionPriority(device_id, priority, [success], [failure]);
+
+### Description
+
+When Connecting to a peripheral android can request for the connection priority for better communication.
+
+### Supported Platforms
+
+ * Android ( >lollipop)
+
+### Parameters
+
+- __device_id__: UUID or MAC address of the peripheral
+- __priority__: high or balanced or low
+- __success__: Success callback function that is invoked when the connection is successful. [optional]
+- __failure__: Error callback function, invoked when error occurs. [optional]
+
 
 ## refreshDeviceCache
 

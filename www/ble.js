@@ -15,7 +15,7 @@
 /* global cordova, module */
 "use strict";
 
-var stringToArrayBuffer = function(str) {
+var stringToArrayBuffer = function (str) {
     var ret = new Uint8Array(str.length);
     for (var i = 0; i < str.length; i++) {
         ret[i] = str.charCodeAt(i);
@@ -23,7 +23,7 @@ var stringToArrayBuffer = function(str) {
     return ret.buffer;
 };
 
-var base64ToArrayBuffer = function(b64) {
+var base64ToArrayBuffer = function (b64) {
     return stringToArrayBuffer(atob(b64));
 };
 
@@ -40,7 +40,7 @@ function convertToNativeJS(object) {
     Object.keys(object).forEach(function (key) {
         var value = object[key];
         object[key] = massageMessageNativeToJs(value);
-        if (typeof(value) === 'object') {
+        if (typeof (value) === 'object') {
             convertToNativeJS(value);
         }
     });
@@ -52,7 +52,7 @@ var autoconnected = {};
 module.exports = {
 
     scan: function (services, seconds, success, failure) {
-        var successWrapper = function(peripheral) {
+        var successWrapper = function (peripheral) {
             convertToNativeJS(peripheral);
             success(peripheral);
         };
@@ -60,7 +60,7 @@ module.exports = {
     },
 
     startScan: function (services, success, failure) {
-        var successWrapper = function(peripheral) {
+        var successWrapper = function (peripheral) {
             convertToNativeJS(peripheral);
             success(peripheral);
         };
@@ -71,8 +71,8 @@ module.exports = {
         cordova.exec(success, failure, 'BLE', 'stopScan', []);
     },
 
-    startScanWithOptions: function(services, options, success, failure) {
-        var successWrapper = function(peripheral) {
+    startScanWithOptions: function (services, options, success, failure) {
+        var successWrapper = function (peripheral) {
             convertToNativeJS(peripheral);
             success(peripheral);
         };
@@ -81,17 +81,17 @@ module.exports = {
     },
 
     // iOS only
-    connectedPeripheralsWithServices: function(services, success, failure) {
+    connectedPeripheralsWithServices: function (services, success, failure) {
         cordova.exec(success, failure, 'BLE', 'connectedPeripheralsWithServices', [services]);
     },
 
     // iOS only
-    peripheralsWithIdentifiers: function(identifiers, success, failure) {
+    peripheralsWithIdentifiers: function (identifiers, success, failure) {
         cordova.exec(success, failure, 'BLE', 'peripheralsWithIdentifiers', [identifiers]);
     },
 
     // Android only
-    bondedDevices: function(success, failure) {
+    bondedDevices: function (success, failure) {
         cordova.exec(success, failure, 'BLE', 'bondedDevices', []);
     },
 
@@ -102,11 +102,11 @@ module.exports = {
 
     connect: function (device_id, success, failure) {
         // wrap success so nested array buffers in advertising info are handled correctly
-        var successWrapper = function(peripheral) {
+        var successWrapper = function (peripheral) {
             convertToNativeJS(peripheral);
             success(peripheral);
         };
-        cordova.exec(successWrapper, failure, 'BLE', 'connect', [device_id]);    
+        cordova.exec(successWrapper, failure, 'BLE', 'connect', [device_id]);
     },
 
     autoConnect: function (deviceId, connectCallback, disconnectCallback) {
@@ -114,24 +114,24 @@ module.exports = {
         autoconnected[deviceId] = true;
 
         // wrap connectCallback so nested array buffers in advertising info are handled correctly
-        var connectCallbackWrapper = function(peripheral) {
+        var connectCallbackWrapper = function (peripheral) {
             convertToNativeJS(peripheral);
             connectCallback(peripheral);
         };
 
         // iOS needs to reconnect on disconnect, unless ble.disconnect was called. 
         if (cordova.platformId === 'ios') {
-            disconnectCallbackWrapper = function(peripheral) {
+            disconnectCallbackWrapper = function (peripheral) {
                 // let the app know the peripheral disconnected
                 disconnectCallback(peripheral);
-    
+
                 // reconnect if we have a peripheral.id and the user didn't call disconnect
                 if (peripheral.id && autoconnected[peripheral.id]) {
                     cordova.exec(connectCallbackWrapper, disconnectCallbackWrapper, 'BLE', 'autoConnect', [deviceId]);
                 }
-            };    
+            };
         } else {  // no wrapper for Android
-            disconnectCallbackWrapper = disconnectCallback; 
+            disconnectCallbackWrapper = disconnectCallback;
         }
 
         cordova.exec(connectCallbackWrapper, disconnectCallbackWrapper, 'BLE', 'autoConnect', [deviceId]);
@@ -140,18 +140,22 @@ module.exports = {
     disconnect: function (device_id, success, failure) {
         try {
             delete autoconnected[device_id];
-        } catch(e) {
+        } catch (e) {
             // ignore error
         }
         cordova.exec(success, failure, 'BLE', 'disconnect', [device_id]);
     },
 
-    requestMtu: function (device_id, mtu,  success, failure) {
+    requestMtu: function (device_id, mtu, success, failure) {
         cordova.exec(success, failure, 'BLE', 'requestMtu', [device_id, mtu]);
     },
 
-    refreshDeviceCache: function(deviceId, timeoutMillis, success, failure) {
-        var successWrapper = function(peripheral) {
+    requestConnectionPriority: function (device_id, connectionPriority, success, failure) {
+        cordova.exec(success, failure, 'BLE', 'requestConnectionPriority', [device_id, connectionPriority])
+    },
+
+    refreshDeviceCache: function (deviceId, timeoutMillis, success, failure) {
+        var successWrapper = function (peripheral) {
             convertToNativeJS(peripheral);
             success(peripheral);
         };
@@ -164,7 +168,7 @@ module.exports = {
     },
 
     // RSSI value comes back as an integer
-    readRSSI: function(device_id, success, failure) {
+    readRSSI: function (device_id, success, failure) {
         cordova.exec(success, failure, 'BLE', 'readRSSI', [device_id]);
     },
 
@@ -234,74 +238,74 @@ module.exports.withPromises = {
     startNotification: module.exports.startNotification,
     startStateNotifications: module.exports.startStateNotifications,
 
-    stopScan: function() {
-        return new Promise(function(resolve, reject) {
+    stopScan: function () {
+        return new Promise(function (resolve, reject) {
             module.exports.stopScan(resolve, reject);
         });
     },
 
-    disconnect: function(device_id) {
-        return new Promise(function(resolve, reject) {
+    disconnect: function (device_id) {
+        return new Promise(function (resolve, reject) {
             module.exports.disconnect(device_id, resolve, reject);
         });
     },
 
-    read: function(device_id, service_uuid, characteristic_uuid) {
-        return new Promise(function(resolve, reject) {
+    read: function (device_id, service_uuid, characteristic_uuid) {
+        return new Promise(function (resolve, reject) {
             module.exports.read(device_id, service_uuid, characteristic_uuid, resolve, reject);
         });
     },
 
-    write: function(device_id, service_uuid, characteristic_uuid, value) {
-        return new Promise(function(resolve, reject) {
+    write: function (device_id, service_uuid, characteristic_uuid, value) {
+        return new Promise(function (resolve, reject) {
             module.exports.write(device_id, service_uuid, characteristic_uuid, value, resolve, reject);
         });
     },
 
     writeWithoutResponse: function (device_id, service_uuid, characteristic_uuid, value) {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             module.exports.writeWithoutResponse(device_id, service_uuid, characteristic_uuid, value, resolve, reject);
         });
     },
 
     stopNotification: function (device_id, service_uuid, characteristic_uuid) {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             module.exports.stopNotification(device_id, service_uuid, characteristic_uuid, resolve, reject);
         });
     },
 
     isConnected: function (device_id) {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             module.exports.isConnected(device_id, resolve, reject);
         });
     },
 
     isEnabled: function () {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             module.exports.isEnabled(resolve, reject);
         });
     },
 
     enable: function () {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             module.exports.enable(resolve, reject);
         });
     },
 
     showBluetoothSettings: function () {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             module.exports.showBluetoothSettings(resolve, reject);
         });
     },
 
     stopStateNotifications: function () {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             module.exports.stopStateNotifications(resolve, reject);
         });
     },
 
-    readRSSI: function(device_id) {
-        return new Promise(function(resolve, reject) {
+    readRSSI: function (device_id) {
+        return new Promise(function (resolve, reject) {
             module.exports.readRSSI(device_id, resolve, reject);
         });
     }
