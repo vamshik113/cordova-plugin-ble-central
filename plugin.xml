@@ -10,8 +10,8 @@
     <license>Apache 2.0</license>
     <keywords>bluetooth, BLE, bluetooth low energy, bluetooth smart</keywords>
 
-    <repo>https://github.com/don/cordova-plugin-ble-central.git</repo>
-    <issue>https://github.com/don/cordova-plugin-ble-central/issues</issue>
+    <repo>https://github.com/vamshik113/cordova-plugin-ble-vegam-central.git</repo>
+    <issue>https://github.com/vamshik113/cordova-plugin-ble-vegam-central/issues</issue>
 
     <dependency id="cordova-plugin-compat" version="^1.2.0" />
 
