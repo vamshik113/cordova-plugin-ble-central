@@ -30,11 +30,11 @@ See the [examples](https://github.com/don/cordova-plugin-ble-central/tree/master
 
 ### Cordova
 
-    $ cordova plugin add cordova-plugin-ble-central
+    $ cordova plugin add cordova-plugin-ble-vegam-central
 
 ### PhoneGap
 
-    $ phonegap plugin add cordova-plugin-ble-central
+    $ phonegap plugin add cordova-plugin-ble-vegam-central
 
 ### PhoneGap Build
 
