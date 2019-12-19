@@ -86,6 +86,9 @@ See Apple's documentation about [Protected Resources](https://developer.apple.co
 - [ble.connectedPeripheralsWithServices](#connectedperipheralswithservices)
 - [ble.peripheralsWithIdentifiers](#peripheralswithidentifiers)
 - [ble.bondedDevices](#bondeddevices)
+- [ble.upgradeFirmware](#upgradeFirmware)
+
+Upgrade a peripheral firmware.
 
 ## scan
 
@@ -798,6 +801,95 @@ Sends a list of bonded low energy peripherals to the success callback.
 
  * Android
 
+ ## upgradeFirmware
+
+Upgrade a peripheral firmware.
+
+```javascript
+ble.upgradeFirmware(device_id, uri, progress, failure);
+```
+
+### Description
+
+Function `upgradeFirmware` upgrades peripheral firmware using the Nordic Semiconductors'
+[proprietary DFU
+protocol](https://devzone.nordicsemi.com/documentation/nrf51/6.0.0/s110/html/a00062.html) (hence
+only Nordic nRF5x series devices can be upgraded). It uses the official DFU libraries for each
+platform and wraps them for use with Apache Cordova. Currently only supported firmware format is a
+[ZIP file](https://devzone.nordicsemi.com/blogs/715/creating-zip-package-for-dfu/) prepared using
+Nordic CLI utilities.
+
+The function presumes a connected BLE peripheral. A progress callback is called multiple times with
+upgrade status info, which is a JSON object of the following format:
+
+```javascript
+{
+    "status": "--machineFriendlyString--"
+}
+```
+
+A complete list of possible status strings is:
+
+- `deviceConnecting`
+- `deviceConnected`
+- `enablingDfuMode`
+- `dfuProcessStarting`
+- `dfuProcessStarted`
+- `firmwareUploading`
+- `progressChanged` - extended status info
+- `firmwareValidating`
+- `dfuCompleted`
+- `deviceDisconnecting`
+- `deviceDisconnected` - the last callback on successful upgrade
+- `dfuAborted` - the last callback on user abort
+
+The list is only approximately ordered. *Not all statuses all presented on both platforms.*
+If `status` is `progressChanged`, the object is extended by a `progress` key like so:
+
+```javascript
+{
+    "status": "progressChanged",
+    "progress": {
+        "percent": 12,
+        "speed": 2505.912325285,
+        "avgSpeed": 1801.8598291,
+        "currentPart": 1,
+        partsTotal: 1
+    }
+}
+```
+
+In a case of error, the JSON object passed to failure callback has following structure:
+
+```javascript
+{
+    "errorMessage": "Hopefully human readable error message"
+}
+```
+
+Please note, that the device will disconnect (possibly multiple times) during the upgrade, so the
+[ble.connect](#connect) error callback will
+trigger. This is intentional.
+
+### Parameters
+
+- __device_id__: UUID or MAC address of the peripheral
+- __uri__: URI of a firmware ZIP file on the **local filesystem**
+  (see [cordova-plugin-file](https://github.com/apache/cordova-plugin-file))
+- __progress__: Progress callback function that is invoked multiple times with upgrade status info
+- __failure__: Error callback function, invoked when an error occurs
+
+### Quick Example
+
+```javascript
+// presume connected device
+
+var device_id = "BD922605-1B07-4D55-8D09-B66653E51BBA"
+var uri = "file:///var/mobile/Applications/12312-1231-1231-123312-123123/Documents/firmware.zip";
+
+ble.upgradeFirmware(device_id, uri, console.log, console.error);
+```
+
 
 # Peripheral Data
 
@@ -991,22 +1083,6 @@ Run the app on your phone
 
     cordova run android --device
 
-# Nordic DFU
-
-If you need Nordic DFU capability, Tomáš Bedřich has a [fork](https://github.com/fxe-gear/cordova-plugin-ble-central) of this plugin that adds an `updateFirmware()` method that allows users to upgrade nRF5x based chips over the air. https://github.com/fxe-gear/cordova-plugin-ble-central
-
 # License
 
 Apache 2.0
-
-# Feedback
-
-Try the code. If you find an problem or missing feature, file an issue or create a pull request.
-
-# Other Bluetooth Plugins
-
- * [cordova-plugin-ble-peripheral](https://github.com/don/cordova-plugin-ble-peripheral) - Create and publish Bluetooth LE services on iOS and Android using Javascript.
- * [BluetoothSerial](https://github.com/don/BluetoothSerial) - Connect to Arduino and other devices. Bluetooth Classic on Android, BLE on iOS.
- * [RFduino](https://github.com/don/cordova-plugin-rfduino) - RFduino specific plugin for iOS and Android.
- * [BluetoothLE](https://github.com/randdusing/BluetoothLE) - Rand Dusing's BLE plugin for Cordova
- * [PhoneGap Bluetooth Plugin](https://github.com/tanelih/phonegap-bluetooth-plugin) - Bluetooth classic pairing and connecting for Android
