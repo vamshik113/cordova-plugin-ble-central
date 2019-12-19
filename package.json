@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-ble-vegam-central",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "Bluetooth Low Energy (BLE) Central Plugin",
   "cordova": {
     "id": "cordova-plugin-ble-vegam-central",
