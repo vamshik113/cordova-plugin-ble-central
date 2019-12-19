@@ -146,7 +146,11 @@ module.exports = {
         cordova.exec(success, failure, 'BLE', 'disconnect', [device_id]);
     },
 
-    requestMtu: function (device_id, mtu, success, failure) {
+    queueCleanup: function (device_id,  success, failure) {
+        cordova.exec(success, failure, 'BLE', 'queueCleanup', [device_id]);
+    },
+
+    requestMtu: function (device_id, mtu,  success, failure) {
         cordova.exec(success, failure, 'BLE', 'requestMtu', [device_id, mtu]);
     },
 
@@ -212,6 +216,11 @@ module.exports = {
         cordova.exec(success, failure, 'BLE', 'isEnabled', []);
     },
 
+    // Android only
+    isLocationEnabled: function (success, failure) {
+        cordova.exec(success, failure, 'BLE', 'isLocationEnabled', []);
+    },
+
     enable: function (success, failure) {
         cordova.exec(success, failure, "BLE", "enable", []);
     },
@@ -250,8 +259,14 @@ module.exports.withPromises = {
         });
     },
 
-    read: function (device_id, service_uuid, characteristic_uuid) {
-        return new Promise(function (resolve, reject) {
+    queueCleanup: function(device_id) {
+        return new Promise(function(resolve, reject) {
+            module.exports.queueCleanup(device_id, resolve, reject);
+        });
+    },
+
+    read: function(device_id, service_uuid, characteristic_uuid) {
+        return new Promise(function(resolve, reject) {
             module.exports.read(device_id, service_uuid, characteristic_uuid, resolve, reject);
         });
     },
